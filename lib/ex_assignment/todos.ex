@@ -94,11 +94,7 @@ defmodule ExAssignment.Todos do
       |> Repo.update_all([])
 
     # Clear the recommended todo if it was marked as done
-    case RecommendedTodo.get() do
-      %Todo{id: ^id} -> RecommendedTodo.clear()
-      _ -> :ok
-    end
-
+    RecommendedTodo.clear()
     :ok
   end
 
