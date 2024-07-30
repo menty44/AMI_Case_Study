@@ -78,10 +78,25 @@ defmodule ExAssignment.Todos do
   end
 
   defp generate_recommendation do
-    list_todos(:open)
-    |> case do
-      [] -> nil
-      todos -> Enum.take_random(todos, 1) |> List.first()
+    open_todos = list_todos(:open)
+
+    case open_todos do
+      [] ->
+        nil
+      todos ->
+        total_weight = Enum.sum(Enum.map(todos, fn todo -> 1 / todo.priority end))
+        random_value = :rand.uniform() * total_weight
+
+        Enum.reduce_while(todos, {0, nil}, fn todo, {acc_weight, _} ->
+          weight = 1 / todo.priority
+          new_acc_weight = acc_weight + weight
+          if new_acc_weight >= random_value do
+            {:halt, {new_acc_weight, todo}}
+          else
+            {:cont, {new_acc_weight, todo}}
+          end
+        end)
+        |> elem(1)
     end
   end
 
@@ -164,7 +179,10 @@ defmodule ExAssignment.Todos do
 
   """
   def delete_todo(%Todo{} = todo) do
-    Repo.delete(todo)
+    data = Repo.delete(todo)
+     # Clear the recommended todo if it was marked as done
+     RecommendedTodo.clear()
+     data
   end
 
   @doc """
