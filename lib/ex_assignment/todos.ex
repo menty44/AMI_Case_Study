@@ -42,23 +42,8 @@ defmodule ExAssignment.Todos do
 
   @doc """
   Returns the next todo that is recommended to be done by the system.
-
-  ASSIGNMENT: ...
   """
-  # def get_recommended() do
-  #   list_todos(:open)
-  #   |> case do
-  #     [] -> nil
-  #     todos -> Enum.take_random(todos, 1) |> List.first()
-  #   end
-  #   |> IO.inspect(label: "get_recommended")
-  # end
-
-
-@doc """
-  Returns the next todo that is recommended to be done by the system.
-  """
-  def get_recommended do
+  def get_recommended() do
     case RecommendedTodo.get() do
       nil ->
         new_recommendation = generate_recommendation()
@@ -77,12 +62,13 @@ defmodule ExAssignment.Todos do
     end
   end
 
-  defp generate_recommendation do
+  defp generate_recommendation() do
     open_todos = list_todos(:open)
 
     case open_todos do
       [] ->
         nil
+
       todos ->
         total_weight = Enum.sum(Enum.map(todos, fn todo -> 1 / todo.priority end))
         random_value = :rand.uniform() * total_weight
@@ -90,6 +76,7 @@ defmodule ExAssignment.Todos do
         Enum.reduce_while(todos, {0, nil}, fn todo, {acc_weight, _} ->
           weight = 1 / todo.priority
           new_acc_weight = acc_weight + weight
+
           if new_acc_weight >= random_value do
             {:halt, {new_acc_weight, todo}}
           else
@@ -112,7 +99,6 @@ defmodule ExAssignment.Todos do
     RecommendedTodo.clear()
     :ok
   end
-
 
   @doc """
   Gets a single todo.
@@ -180,9 +166,9 @@ defmodule ExAssignment.Todos do
   """
   def delete_todo(%Todo{} = todo) do
     data = Repo.delete(todo)
-     # Clear the recommended todo if it was marked as done
-     RecommendedTodo.clear()
-     data
+    # Clear the recommended todo if it was marked as done
+    RecommendedTodo.clear()
+    data
   end
 
   @doc """
