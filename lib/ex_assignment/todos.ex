@@ -7,6 +7,7 @@ defmodule ExAssignment.Todos do
   alias ExAssignment.Repo
 
   alias ExAssignment.Todos.Todo
+  alias ExAssignment.RecommendedTodo
 
   @doc """
   Returns the list of todos, optionally filtered by the given type.
@@ -44,13 +45,63 @@ defmodule ExAssignment.Todos do
 
   ASSIGNMENT: ...
   """
-  def get_recommended() do
+  # def get_recommended() do
+  #   list_todos(:open)
+  #   |> case do
+  #     [] -> nil
+  #     todos -> Enum.take_random(todos, 1) |> List.first()
+  #   end
+  #   |> IO.inspect(label: "get_recommended")
+  # end
+
+
+@doc """
+  Returns the next todo that is recommended to be done by the system.
+  """
+  def get_recommended do
+    case RecommendedTodo.get() do
+      nil ->
+        new_recommendation = generate_recommendation()
+        RecommendedTodo.set(new_recommendation)
+        new_recommendation
+
+      todo ->
+        # Check if the todo is still open
+        if todo.done do
+          new_recommendation = generate_recommendation()
+          RecommendedTodo.set(new_recommendation)
+          new_recommendation
+        else
+          todo
+        end
+    end
+  end
+
+  defp generate_recommendation do
     list_todos(:open)
     |> case do
       [] -> nil
       todos -> Enum.take_random(todos, 1) |> List.first()
     end
   end
+
+  @doc """
+  Marks the todo referenced by the given id as checked (done).
+  """
+  def check(id) do
+    {_, _} =
+      from(t in Todo, where: t.id == ^id, update: [set: [done: true]])
+      |> Repo.update_all([])
+
+    # Clear the recommended todo if it was marked as done
+    case RecommendedTodo.get() do
+      %Todo{id: ^id} -> RecommendedTodo.clear()
+      _ -> :ok
+    end
+
+    :ok
+  end
+
 
   @doc """
   Gets a single todo.
