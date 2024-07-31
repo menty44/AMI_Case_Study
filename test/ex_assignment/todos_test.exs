@@ -55,6 +55,21 @@ defmodule ExAssignment.TodosTest do
       assert_raise Ecto.NoResultsError, fn -> Todos.get_todo!(todo.id) end
     end
 
+    test "marks a todo as done" do
+      todo = todo_fixture()
+
+      assert :ok = Todos.check(todo.id)
+      assert Todos.get_todo!(todo.id).done == true
+
+    end
+
+    test "marks a todo as undone" do
+      todo = todo_fixture()
+
+      assert :ok = Todos.uncheck(todo.id)
+      assert Todos.get_todo!(todo.id).done == false
+    end
+
     test "change_todo/1 returns a todo changeset" do
       todo = todo_fixture()
       assert %Ecto.Changeset{} = Todos.change_todo(todo)
