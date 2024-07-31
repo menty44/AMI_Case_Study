@@ -60,7 +60,6 @@ defmodule ExAssignment.TodosTest do
 
       assert :ok = Todos.check(todo.id)
       assert Todos.get_todo!(todo.id).done == true
-
     end
 
     test "marks a todo as undone" do

@@ -1,4 +1,7 @@
 defmodule ExAssignment.RecommendedTodo do
+  @moduledoc """
+  This module contains todo agent for persisting recommendation data.
+  """
   use Agent
 
   def start_link(_) do

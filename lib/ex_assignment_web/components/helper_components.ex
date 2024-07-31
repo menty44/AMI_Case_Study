@@ -1,4 +1,8 @@
 defmodule ExAssignmentWeb.HelperComponents do
+  @moduledoc """
+  This module contains helper components.
+  """
+
   use Phoenix.Component
   import ExAssignmentWeb.CoreComponents
 

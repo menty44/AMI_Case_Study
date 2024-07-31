@@ -1,4 +1,8 @@
 defmodule ExAssignment.Todos.Todo do
+  @moduledoc """
+  This module contains todo schema and changeset.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 
